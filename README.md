@@ -2,6 +2,7 @@
 This program predicts whether a patient has a medical condition known as Diabetic Retinopathy based on both categorical(integer) and continuous(float) features. This was created for learning purposes only. 
 
 These are the 18 features used below: 
+
 0) The binary result of quality assessment. 0 = bad quality 1 = sufficient quality.
 1) The binary result of pre-screening, where 1 indicates severe retinal abnormality and 0 its lack.</br></br>
 2-7) The results of MA detection. Each feature value stand for the number of MAs found at the confidence levels alpha = 0.5, . . . , 1, respectively.
