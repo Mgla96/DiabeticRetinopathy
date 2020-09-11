@@ -1,4 +1,4 @@
-# DiabeticRetinopothy
+# Diabetic Retinopathy
 This program predicts whether a patient has a medical condition known as Diabetic Retinopathy based on both categorical(integer) and continuous(float) features. This was created for learning purposes only. I implemented a decision tree machine learning model with random forests to increase accuracy.
 
 
