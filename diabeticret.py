@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# Starter code for CS 165B HW3
 import numpy as np
 import random
 
@@ -12,7 +11,6 @@ Combine entropy of branches with weights for total entropy after split
 Lowest Entropy & lower than before split = Greatest information gain
 We want the feature with greatest information gain
 """
-
 
 class decisionTree(object):
     def __init__(self):
@@ -56,7 +54,7 @@ def get_parents(tree):
 
 
 def get_parent_helper(tree, parents):
-    if(tree.parent is not None):
+    if tree.parent is not None:
         parents.append(tree.parent)
         get_parent_helper(tree.parent, parents)
     else:
@@ -116,10 +114,7 @@ def getEntropyInt(c, label, idx):
     ent2Final = 1
     splitRange = None
     for splitVal in split:  # iterating through trying to find best split val
-        leaf1Pos = 0
-        leaf1Neg = 0
-        leaf2Pos = 0
-        leaf2Neg = 0
+        leaf1Pos = leaf1Neg = leaf2Pos = leaf2Neg = 0
         # for each split value calculating all the positive and negative labeled values for leaf1 and leaf2
         for i in range(len(label)):
             # int(c[i])  #if i replace with c again so entropy of floats too high and overall score without using float features, score higher
@@ -129,15 +124,15 @@ def getEntropyInt(c, label, idx):
                 else:
                     leaf1Neg += 1
             else:  # for leaf 2 when greater than the split value
-                if(label[i] == 1):  # label says true
+                if label[i] == 1:  # label says true
                     leaf2Pos += 1
                 else:
                     leaf2Neg += 1
-        if(leaf1Pos+leaf1Neg != 0):
+        if (leaf1Pos+leaf1Neg) != 0:
             pdot1 = leaf1Pos/float(leaf1Pos+leaf1Neg)
         else:
             pdot1 = 0
-        if(leaf2Pos+leaf2Neg != 0):
+        if (leaf2Pos+leaf2Neg) != 0:
             pdot2 = leaf2Pos/float(leaf2Pos+leaf2Neg)
         else:
             pdot2 = 0
@@ -145,7 +140,7 @@ def getEntropyInt(c, label, idx):
             ent1 = 0
         else:
             ent1 = -pdot1*np.log2(pdot1) - (1-pdot1)*np.log2(1-pdot1)
-        if(pdot2 == 0 or pdot2 == 1):
+        if pdot2 == 0 or pdot2 == 1:
             ent2 = 0
         else:
             ent2 = -pdot2*np.log2(pdot2) - (1-pdot2)*np.log2(1-pdot2)
@@ -188,7 +183,6 @@ def transformMatrix(c, idx):
 def getEntropyFloat(c, label, idx):
     '''
     sorts c in increasing order and splits inbetween each for the split values to test
-
     use gain ratio to remove bias for information gain to attributes with a large number of values
     '''
     d = np.sort(c, axis=0, kind="quicksort")
@@ -197,43 +191,35 @@ def getEntropyFloat(c, label, idx):
         split.append((d[splitVal]+d[splitVal+1])/2)
     size = len(label)
     smallestEntropy = 1
-    ent1Final = None
-    ent2Final = None
-    splitRange = None
-    leaf1PosFinal = 0
-    leaf1NegFinal = 0
-    leaf2PosFinal = 0
-    leaf2NegFinal = 0
+    ent1Final = ent2Final = splitRange = None
+    leaf1PosFinal = leaf1NegFinal = leaf2PosFinal = leaf2NegFinal = 0
     for splitVal in split:  # iterating through trying to find best split val
-        leaf1Pos = 0
-        leaf1Neg = 0
-        leaf2Pos = 0
-        leaf2Neg = 0
+        leaf1Pos = leaf1Neg = leaf2Pos = leaf2Neg = 0
         # for each split value calculating all the positive and negative labeled values for leaf1 and leaf2
         for i in range(len(label)):
             if c[i] <= splitVal:
-                if(label[i] == 1):  # label says true
+                if label[i] == 1:  # label says true
                     leaf1Pos += 1
                 else:
                     leaf1Neg += 1
             else:  # for leaf 2 when greater than the split value
-                if(label[i] == 1):  # label says true
+                if label[i] == 1:  # label says true
                     leaf2Pos += 1
                 else:
                     leaf2Neg += 1
-        if(leaf1Pos+leaf1Neg != 0):
+        if (leaf1Pos+leaf1Neg) != 0:
             pdot1 = leaf1Pos/float(leaf1Pos+leaf1Neg)
         else:
             pdot1 = 0
-        if(leaf2Pos+leaf2Neg != 0):
+        if (leaf2Pos+leaf2Neg) != 0:
             pdot2 = leaf2Pos/float(leaf2Pos+leaf2Neg)
         else:
             pdot2 = 0
-        if(pdot1 == 0 or pdot1 == 1):
+        if pdot1 == 0 or pdot1 == 1:
             ent1 = 0
         else:
             ent1 = -pdot1*np.log2(pdot1) - (1-pdot1)*np.log2(1-pdot1)
-        if(pdot2 == 0 or pdot2 == 1):
+        if pdot2 == 0 or pdot2 == 1:
             ent2 = 0
         else:
             ent2 = -pdot2*np.log2(pdot2) - (1-pdot2)*np.log2(1-pdot2)
@@ -275,7 +261,6 @@ def getNewData(train_data, train_labels, bestFeature, rnge, section):
     train_data_new = np.delete(train_data, removeRows, 0)
     train_labels_new = np.delete(train_labels, removeRows, 0)
     return train_data_new, train_labels_new
-# flg 0 for left or 1 for right
 
 
 def build(tree, train_data, train_labels, flg, forestfeatures):
@@ -299,30 +284,26 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
         Ent2BeforeSplit = tree.parent.ent2
     minEntropy = 1
     bestFeature = -1
-    leaf1PosFinal = 0
-    leaf1NegFinal = 0
-    leaf2PosFinal = 0
-    leaf2NegFinal = 0
+    leaf1PosFinal = leaf1NegFinal = leaf2PosFinal = leaf2NegFinal = 0
     thernge = 0
     earlyStop = 20  # 4
-    ent1Final = 1
-    ent2Final = 1
+    ent1Final = ent2Final = 1
     for i in range(train_data[0].size):  # length of a row
         # if(i not in parentsList): #save time because woudn't need feature already used by parent (maybe ignore this and allow more splits but a lot worse runtime
         c = train_data.T[i]  # a column
-        if((i <= 1 or i == 18) and i in forestfeatures):
+        if (i <= 1 or i == 18) and i in forestfeatures:
             entro, rnge, leaf1Entropy, leaf2Entropy, leaf1Pos, leaf1Neg, leaf2Pos, leaf2Neg = getEntropyBin(
                 c, train_labels)
-        elif((i >= 2 and i <= 7) and i in forestfeatures):
+        elif (i >= 2 and i <= 7) and i in forestfeatures:
             entro, rnge, leaf1Entropy, leaf2Entropy, leaf1Pos, leaf1Neg, leaf2Pos, leaf2Neg = getEntropyInt(
                 c, train_labels, i)
-        elif(i in forestfeatures):
+        elif i in forestfeatures:
             entro, rnge, leaf1Entropy, leaf2Entropy, leaf1Pos, leaf1Neg, leaf2Pos, leaf2Neg = getEntropyFloat(
                 c, train_labels, i)
         else:
             # not in forestfeature list so don't use (random forests implementation)
             continue
-        if(entro < minEntropy):
+        if entro < minEntropy:
             minEntropy = entro
             thernge = rnge
             bestFeature = i
@@ -377,7 +358,6 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
         if(leaf1PosFinal+leaf1NegFinal < earlyStop or ent1Final == 0):
             if(leaf2PosFinal+leaf2NegFinal < earlyStop or ent2Final == 0):  # both leaves
                 #print("leaf1&2 early stop")
-                # print("leaf1PosFinal",leaf1PosFinal,"leaf1NegFinal",leaf1NegFinal,"leaf2PosFinal",leaf2PosFinal,"leaf2NegFinal",leaf2NegFinal,"leaf1Entropy",leaf1EntropyFinal,"leaf2Entropy",leaf2EntropyFinal)
                 leafLeft = decisionTree()
                 leafLeft.isLeaf = True
                 leafLeft.leafVal = leaf1Prob
@@ -390,28 +370,22 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
                 leafRight.parent = tree
             else:  # only left side leaf
                 #print("only leaf1 early stop")
-                # print("leaf1PosFinal",leaf1PosFinal,"leaf1NegFinal",leaf1NegFinal,"leaf2PosFinal",leaf2PosFinal,"leaf2NegFinal",leaf2NegFinal,"leaf1Entorpy",leaf1Entropy)
                 leafLeft = decisionTree()
                 leafLeft.isLeaf = True
                 leafLeft.leafVal = leaf1Prob
                 tree.left = leafLeft
                 leafLeft.parent = tree
-
                 tree.right = decisionTree()
                 tree.right.parent = tree
-                trainData, trainLabels = getNewData(
-                    train_data, train_labels, bestFeature, tree.range, 1)  # updates Matrix
-                # trainData, trainLabels = getNewData(train_data,train_labels,bestFeature,tree.range,1) #updates Matrix
+                trainData, trainLabels = getNewData(train_data, train_labels, bestFeature, tree.range, 1)  # updates Matrix
                 build(tree.right, trainData, trainLabels, 1, forestfeatures)
         else:  # first part not leaf
             if(leaf2PosFinal+leaf2NegFinal < earlyStop or ent2Final == 0):  # only right side leaf
                 #print("only leaf2 early stop")
-                # print("leaf1PosFinal",leaf1PosFinal,"leaf1NegFinal",leaf1NegFinal,"leaf2PosFinal",leaf2PosFinal,"leaf2NegFinal",leaf2NegFinal,"leaf2entropy",leaf2Entropy)
                 leafRight = decisionTree()
                 leafRight.isLeaf = True
                 leafRight.leafVal = leaf2Prob
                 tree.right = leafRight
-
                 tree.left = decisionTree()
                 tree.left.parent = tree
 
@@ -420,7 +394,6 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
                 build(tree.left, trainData, trainLabels, 0, forestfeatures)
             else:  # both aren't leaves
                 #print("no early stop for either leaves")
-                # print("leaf1PosFinal",leaf1PosFinal,"leaf1NegFinal",leaf1NegFinal,"leaf2PosFinal",leaf2PosFinal,"leaf2NegFinal",leaf2NegFinal)
                 tree.left = decisionTree()
                 tree.left.parent = tree
                 tree.right = decisionTree()
@@ -442,11 +415,9 @@ def solve(tree, test_data_row):  # test_data row
         if(transformed[tree.feature] <= tree.get_range()):
             #print("transformed[tree.feature]",transformed[tree.feature],"original val",test_data_row[tree.feature],"divideval",tree.get_range())
             return solve(tree.left, test_data_row)
-            # return solve(tree.left,test_data_row)
         else:
             #print("when feature > range transformed[tree.feature]",transformed[tree.feature],"original val",test_data_row[tree.feature],tree.get_range())
             return solve(tree.right, test_data_row)
-            # return solve(tree.right,test_data_row)
     else:  # it is leaf so return val
         return tree.leafVal
 
@@ -463,7 +434,6 @@ def print_tree(tree):
 def compareRandomForests(treeArr, trainData, trainLabels):
     ''' 
     get accuracy of each random forest and return tree with best accuracy
-
     '''
     accuracyFinal = 0
     treeFinal = None
