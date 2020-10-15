@@ -35,7 +35,7 @@ class decisionTree(object):
         self.parent.left = left
         self.parent.right = right
         self.parent.parent = None
-
+    
     def setChildren(self, left, right):
         self.left = left
         self.right = right
@@ -62,10 +62,7 @@ def get_parent_helper(tree, parents):
 
 
 def getEntropyBin(c, label):
-    onePos = 0
-    oneNeg = 0
-    zeroPos = 0
-    zeroNeg = 0
+    onePos = oneNeg = zeroPos = zeroNeg = 0
     size = len(label)
     for i in range(c.size):
         if(c[i] == 1):
@@ -105,13 +102,8 @@ def getEntropyInt(c, label, idx):
     for splitVal in range(len(label)-1):
         split.append((d[splitVal]+d[splitVal+1])/2)
     size = len(label)
-    leaf1PosFinal = 0
-    leaf1NegFinal = 0
-    leaf2PosFinal = 0
-    leaf2NegFinal = 0
-    smallestEntropy = 1
-    ent1Final = 1
-    ent2Final = 1
+    leaf1PosFinal = leaf1NegFinal = leaf2PosFinal = leaf2NegFinal = 0
+    smallestEntropy = ent1Final = ent2Final = 1
     splitRange = None
     for splitVal in split:  # iterating through trying to find best split val
         leaf1Pos = leaf1Neg = leaf2Pos = leaf2Neg = 0
@@ -148,13 +140,9 @@ def getEntropyInt(c, label, idx):
             (ent2*((leaf2Pos+leaf2Neg)/size))
         if Entropy < smallestEntropy:
             smallestEntropy = Entropy
-            ent1Final = ent1
-            ent2Final = ent2
+            ent1Final,ent2Final = ent1,ent2
             splitRange = splitVal
-            leaf1PosFinal = leaf1Pos
-            leaf1NegFinal = leaf1Neg
-            leaf2PosFinal = leaf2Pos
-            leaf2NegFinal = leaf2Neg
+            leaf1PosFinal,leaf1NegFinal,leaf2PosFinal,leaf2NegFinal = leaf1Pos,leaf1Neg,leaf2Pos,leaf2Neg
     return smallestEntropy, splitRange, ent1Final, ent2Final, leaf1PosFinal, leaf1NegFinal, leaf2PosFinal, leaf2NegFinal
 
 
@@ -251,7 +239,7 @@ def getNewData(train_data, train_labels, bestFeature, rnge, section):
     else:  # section1
         # so will go through every row of the training data
         for i in range(train_labels.size):
-            if(c[i] <= rnge):
+            if c[i] <= rnge:
                 removeRows.append(i)
     train_data_new = np.delete(train_data, removeRows, 0)
     train_labels_new = np.delete(train_labels, removeRows, 0)
@@ -264,10 +252,13 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
     -0 for being built off left attribute
     -1 for being built off right attribute
     '''
-    #parents = get_parents(tree)
-    #parentsList = []
-    # for parent in parents:
-    #    parentsList.append(parent.feature)
+    forestfeatures=set(forestfeatures)
+    '''
+    parents = get_parents(tree)
+    parentsList = []
+    for parent in parents:
+        parentsList.append(parent.feature)
+    '''
     if flg == 2:
         Ent1BeforeSplit = Ent2BeforeSplit = 1
     else:
@@ -297,12 +288,8 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
             minEntropy = entro
             thernge = rnge
             bestFeature = i
-            leaf1PosFinal = leaf1Pos
-            leaf1NegFinal = leaf1Neg
-            leaf2PosFinal = leaf2Pos
-            leaf2NegFinal = leaf2Neg
-            ent1Final = leaf1Entropy
-            ent2Final = leaf2Entropy
+            leaf1PosFinal,leaf1NegFinal,leaf2PosFinal,leaf2NegFinal = leaf1Pos,leaf1Neg,leaf2Pos,leaf2Neg
+            ent1Final,ent2Final = leaf1Entropy,leaf2Entropy
 
     # left branch so compare with left entropy before split
     if flg == 0 and minEntropy > Ent1BeforeSplit:
@@ -322,8 +309,7 @@ def build(tree, train_data, train_labels, flg, forestfeatures):
     else:
         tree.feature = bestFeature
         tree.entropy = minEntropy
-        tree.ent1 = ent1Final
-        tree.ent2 = ent2Final
+        tree.ent1,tree.ent2 = ent1Final,ent2Final
         tree.range = thernge
     if leaf1PosFinal > leaf1NegFinal:
         leaf1Prob = 1
@@ -461,26 +447,20 @@ def run_train_test(training_data, training_labels, testing_data):
     testData = np.array(testing_data)
 
     #root = decisionTree()
-    forestFeatures = [0, 1, 2, 3, 4, 5, 6, 7, 8,
-                      9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    forestFeatures = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     # build(root, trainData, trainLabels,2, forestFeatures) #original tree to test against
     # treeArr=[root]
     treeArr = []
     #trainMatrix = np.insert(trainData,19,trainLabels,1)
-    for _ in range(7):
+    for _ in range(8): 
         #trainSample = trainMatrix[np.random.choice(trainMatrix.shape[0], 100, replace=False)]
-        random.shuffle(forestFeatures)
+        random.shuffle(forestFeatures) #For random forests, shuffling all features so it's built with 5 random features
         anotherRoot = decisionTree()
-        #trainSampleJustVals= trainSample[:,[0,19]]
-        #trainSampJustLabels = trainSample[:,19]
-        #trainSampleVals = trainData[:,feats]
         build(anotherRoot, trainData, trainLabels, 2, forestFeatures[0:5])
-        # build(anotherRoot, trainData, trainLabels,2, forestFeatures[0:5]) #splitting numpy array back to training values and labels
         treeArr.append(anotherRoot)
     finalTree = compareRandomForests(treeArr, trainData, trainLabels)
     # print_tree(root)
     sol = []
     for row in testData:
-        # sol.append(solve(root,row))
         sol.append(solve(finalTree, row))
     return sol
